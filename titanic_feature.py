@@ -17,12 +17,12 @@ def g():
 
     project = hopsworks.login()
     fs = project.get_feature_store()
-    titanic_df = pd.read_csv("https://raw.githubusercontent.com/ponyyuhan/ID2223_lab1/main/titanic-cleaned_processed3.csv") #, on_bad_lines='skip')
+    titanic_df = pd.read_csv("https://raw.githubusercontent.com/ponyyuhan/ID2223_ML_lab1/main/titanic-cleaned_processed3.csv") #, on_bad_lines='skip')
     titanic_fg = fs.get_or_create_feature_group(
-        name="titanic_modal_more_specs",
+        name="titanic_survival_modal",
         version=1,
         primary_key=["pclass","sex","age","sibsp","parch","embarked","fare_per_customer","cabin"], 
-        description="Titanic Survival Dataset (more specs)")
+        description="Titanic Survival Dataset")
     titanic_fg.insert(titanic_df, write_options={"wait_for_job" : False})
 
 if __name__ == "__main__":
