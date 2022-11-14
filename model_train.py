@@ -15,10 +15,11 @@ if LOCAL == False:
 def g():
     import hopsworks
     import pandas as pd
-    from sklearn.ensemble import GradientBoostingClassifier 
-    from sklearn.ensemble import GradientBoostingRegressor
-    from sklearn import tree # using decision tree algorithm
-    from sklearn.neighbors import KNeighborsClassifier
+    #from sklearn.ensemble import GradientBoostingClassifier 
+    #from sklearn.ensemble import GradientBoostingRegressor
+    #from sklearn import tree # using decision tree algorithm
+    #from sklearn.neighbors import KNeighborsClassifier
+    from sklearn.ensemble import RandomForestClassifier
     from sklearn.metrics import accuracy_score
     from sklearn.metrics import confusion_matrix
     from sklearn.metrics import classification_report
@@ -36,18 +37,18 @@ def g():
     # The feature view is the input set of features for your model. The features can come from different feature groups.    
     # You can select features from different feature groups and join them together to create a feature view
     try:  
-        feature_view = fs.get_feature_view(name="titanic_modal_more_specs", version=1)
+        feature_view = fs.get_feature_view(name="titanic_survival_modal", version=1)
     except:
-        titanic_fg = fs.get_feature_group(name="titanic_modal_more_specs", version=1)
+        titanic_fg = fs.get_feature_group(name="titanic_survival_modal", version=1)
         query = titanic_fg.select_all()
-        feature_view = fs.create_feature_view(name="titanic_modal_more_specs",
+        feature_view = fs.create_feature_view(name="titanic_survival_modal",
                                           version=1,
                                           description="Read from titanic survival dataset",
                                           labels=["survived"],
                                           query=query)    
 
     # You can read training data, randomly split into train/test sets of features (X) and labels (y)        
-    X_train, X_test, y_train, y_test = feature_view.train_test_split(0.1)
+    X_train, X_test, y_train, y_test = feature_view.train_test_split(0.2)
 
     # Train our model with the Scikit-learn K-nearest-neighbors algorithm using our features (X_train) and labels (y_train)
     # model = KNeighborsClassifier(n_neighbors=4)
@@ -56,7 +57,10 @@ def g():
     # model = tree.DecisionTreeClassifier(criterion="gini", random_state=1, max_depth=4)
     
     # Train with Gradient Boosted Method 
-    model = GradientBoostingClassifier(n_estimators=100, learning_rate=0.15, random_state=1, max_depth=5)
+    # model = GradientBoostingClassifier(n_estimators=100, learning_rate=0.15, random_state=1, max_depth=5)
+    
+    # Train with RFC
+    model = RandomForestClassifier(n_estimators=1000, max_depth=7, min_weight_fraction_leaf=0.00001)
     model.fit(X_train, y_train.values.ravel())
 
     # Evaluate model performance using the features from the test set (X_test)
@@ -76,7 +80,7 @@ def g():
     mr = project.get_model_registry()
     
     # The contents of the 'titanic_model' directory will be saved to the model registry. Create the dir, first.
-    model_dir="titanic_modal_more_specs"
+    model_dir="titanic_survival_modal"
     if os.path.isdir(model_dir) == False:
         os.mkdir(model_dir)
 
@@ -92,7 +96,7 @@ def g():
 
     # Create an entry in the model registry that includes the model's name, desc, metrics
     titanic_model = mr.python.create_model(
-        name="titanic_modal_more_specs", 
+        name="titanic_survival_modal", 
         metrics={"accuracy" : metrics['accuracy']},
         model_schema=model_schema,
         description="Titanic Survival Predictor"
@@ -107,3 +111,4 @@ if __name__ == "__main__":
     else:
         with stub.run():
             f()
+
