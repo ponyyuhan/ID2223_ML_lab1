@@ -44,9 +44,9 @@ def g():
     batch_data = feature_view.get_batch_data()
 
     y_pred = model.predict(np.asarray(batch_data).reshape(-1,8))
-    offset = 300
+    offset = 4
     # print(y_pred)
-    while offset<305:    
+    while offset>0:    
         person = y_pred[y_pred.size - offset]
         person_url="https://raw.githubusercontent.com/ponyyuhan/ID2223_ML_lab1/main/"+person+".png"
         print("Survival predicted: " + person)
@@ -59,7 +59,7 @@ def g():
         df = tit_fg.read()
     #print(df)
         label = df.iloc[-offset]["survived"]
-        offset=offset+1
+        offset=offset-1
         label_url="https://raw.githubusercontent.com/ponyyuhan/ID2223_ML_lab1/main/"+label+".png"
         img = Image.open(requests.get(label_url, stream=True).raw)            
         img.save("./actual_survived.png")
@@ -117,7 +117,7 @@ def g():
         dataset_api.upload("./confusion_matrix.png", "Resources/images", overwrite=True)
       
     else:
-        print("You need 5 different people predictions to create the confusion matrix.")
+        print("You need 3 different people predictions to create the confusion matrix.")
         print("bad guy")
 
 
