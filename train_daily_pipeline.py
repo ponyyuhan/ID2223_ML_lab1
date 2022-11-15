@@ -42,8 +42,8 @@ def get_random_titanic():
     import pandas as pd
     import random
 
-    survived_df = generate_titanic("S", 1, 4, 0, 2, 30, 0, 0, 5,0,6,1,4,0,200,0,2)
-    deceased_df = generate_titanic("D", 1, 4, 0, 2, 80, 50, 0, 5,0,6,1,4,0,200,0,2)
+    survived_df = generate_titanic("S", 1, 4, 1, 2, 30, 0, 0, 5,0,6,1,4,0,200,1,2)
+    deceased_df = generate_titanic("D", 1, 4, 0, 1, 80, 50, 0, 5,0,6,1,4,0,200,0,1)
 
     pick_random = random.uniform(0,2)
     if pick_random >= 1:
