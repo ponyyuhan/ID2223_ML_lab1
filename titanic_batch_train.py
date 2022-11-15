@@ -48,16 +48,26 @@ def g():
     # print(y_pred)
     while offset<305:    
         person = y_pred[y_pred.size - offset]
+        person_url="https://raw.githubusercontent.com/ponyyuhan/ID2223_ML_lab1/main/"+person+".png"
         print("Survival predicted: " + person)
-
+        img = Image.open(requests.get(person_url, stream=True).raw)            
+        img.save("./latest_survived.png")
+        dataset_api = project.get_dataset_api()    
+        dataset_api.upload("./latest_survived.png", "Resources/images", overwrite=True)
 
         tit_fg = fs.get_feature_group(name="titanic_survival_modal", version=1)
         df = tit_fg.read()
     #print(df)
         label = df.iloc[-offset]["survived"]
         offset=offset+1
+        label_url="https://raw.githubusercontent.com/ponyyuhan/ID2223_ML_lab1/main/"+label+".png"
+        img = Image.open(requests.get(label_url, stream=True).raw)            
+        img.save("./actual_survived.png")
+        dataset_api.upload("./actual_survived.png", "Resources/images", overwrite=True)
 
         print("Survival actual: " + label)
+        
+        dataset_api = project.get_dataset_api()    
 
         monitor_fg = fs.get_or_create_feature_group(name="titanic_predictions",
                                                     version=1,
@@ -79,15 +89,15 @@ def g():
     # the insertion was done asynchronously, so it will take ~1 min to land on App
         history_df = pd.concat([history_df, monitor_df])
 
-   #df_recent = history_df.tail(4)
+    
+        df_recent = history_df.tail(4)
+
+        dfi.export(df_recent, './df_recent.png', table_conversion='matplotlib')
+        dataset_api.upload("./df_recent.png", "Resources/images", overwrite=True)
 
 
-   # dfi.export(df_recent, './df_recent.png', table_conversion='matplotlib')
-   # dataset_api.upload("./df_recent.png", "Resources/images", overwrite=True)
-
-
-    predictions = history_df[['prediction']]
-    labels = history_df[['label']]
+        predictions = history_df[['prediction']]
+        labels = history_df[['label']]
     
     print(predictions)
     #metrics = classification_report(y_test, y_pred, output_dict=True)
@@ -102,6 +112,9 @@ def g():
                              ['Pred Survived', 'Pred Deceased'])
 
         cm = sns.heatmap(df_cm, annot=True)
+        fig=cm.get_figure()
+        fig.savefig("./confusion_matrix.png")
+        dataset_api.upload("./confusion_matrix.png", "Resources/images", overwrite=True)
       
     else:
         print("You need 5 different people predictions to create the confusion matrix.")
